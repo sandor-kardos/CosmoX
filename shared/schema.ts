@@ -1,26 +1,20 @@
-import { pgTable, text, serial, timestamp } from "drizzle-orm/pg-core";
-import { relations } from "drizzle-orm";
+import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-
-export const profiles = pgTable("profiles", {
-  id: serial("id").primaryKey(),
+export const profiles = sqliteTable("profiles", {
+  id: integer("id").primaryKey({ autoIncrement: true }),
   name: text("name"),
   birthDate: text("birth_date").notNull(),
   birthTime: text("birth_time"),
-  createdAt: timestamp("created_at").defaultNow(),
+  createdAt: text("created_at").default(new Date().toISOString()),
 });
-
 export const insertProfileSchema = createInsertSchema(profiles).pick({
   name: true,
   birthDate: true,
   birthTime: true,
 });
-
 export type InsertProfile = z.infer<typeof insertProfileSchema>;
 export type Profile = typeof profiles.$inferSelect;
-
-// Zodiac system types
 export interface ZodiacSign {
   sign: string;
   symbol: string;
@@ -31,7 +25,6 @@ export interface ZodiacSign {
   description: string;
   detailedDescription?: string;
 }
-
 export interface ChineseZodiac {
   animal: string;
   element: string;
@@ -41,7 +34,6 @@ export interface ChineseZodiac {
   description: string;
   elementDescription: string;
 }
-
 export interface VedicSign {
   nakshatra: string;
   number: number;
@@ -52,7 +44,6 @@ export interface VedicSign {
   description: string;
   planetaryInfluences: { planet: string; influence: string }[];
 }
-
 export interface MayanSign {
   daySign: string;
   number: number;
@@ -61,7 +52,6 @@ export interface MayanSign {
   description: string;
   sacredGifts: { gift: string; description: string }[];
 }
-
 export interface CelticSign {
   tree: string;
   dateRange: string;
@@ -71,7 +61,6 @@ export interface CelticSign {
   description: string;
   celticWisdom: string;
 }
-
 export interface EgyptianSign {
   deity: string;
   dateRange: string;
@@ -81,7 +70,6 @@ export interface EgyptianSign {
   sacredAttributes: string[];
   divineGuidance: string;
 }
-
 export interface ArabicSign {
   mansion: string;
   number: number;
@@ -93,7 +81,6 @@ export interface ArabicSign {
   description: string;
   magicalUses: { use: string; description: string }[];
 }
-
 export interface ZodiacProfile {
   western: ZodiacSign;
   chinese: ChineseZodiac;
