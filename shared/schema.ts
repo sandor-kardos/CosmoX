@@ -1,12 +1,12 @@
-import { sqliteTable, text, integer } from "drizzle-orm/sqlite-core";
+import { pgTable, text, serial } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
-export const profiles = sqliteTable("profiles", {
-  id: integer("id").primaryKey({ autoIncrement: true }),
+export const profiles = pgTable("profiles", {
+  id: serial("id").primaryKey(),
   name: text("name"),
   birthDate: text("birth_date").notNull(),
   birthTime: text("birth_time"),
-  createdAt: text("created_at").default(new Date().toISOString()),
+  createdAt: text("created_at").default("now()"),
 });
 export const insertProfileSchema = createInsertSchema(profiles).pick({
   name: true,
