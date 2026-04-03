@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // ✅ enable cors for frontend domain
 app.use(cors({
-  origin: "https://cosmox.sandorkardos.com",
+  origin: process.env.NODE_ENV === "production" ? "https://cosmox.sandorkardos.com" : ["http://localhost:5000", "http://127.0.0.1:5000"],
   credentials: true,
 }));
 
