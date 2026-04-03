@@ -13,8 +13,8 @@ import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { calculateCompatibility, type CompatibilityMatch } from "@/lib/compatibility-calculator";
 import { calculateZodiacProfile } from "@/lib/zodiac-calculator";
-import type { ZodiacProfile, Profile, InsertProfile } from "@shared/schema";
-import { insertProfileSchema } from "@shared/schema";
+import type { ZodiacProfile, Profile } from "@shared/schema";
+import { insertProfileSchema, type InsertProfile } from "@shared/validations";
 import { useLocation } from "wouter";
 import { useToast } from "@/hooks/use-toast";
 
