@@ -1,0 +1,30 @@
+version: "3"
+
+services:
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: n8n
+    ports:
+      - "5678:5678"
+    env_file:
+      - .env
+    environment:
+      - N8N_SECURE_COOKIE=false
+      - N8N_BASIC_AUTH_ACTIVE=true
+      - N8N_BASIC_AUTH_USER=admin
+      - N8N_BASIC_AUTH_PASSWORD=changeThisPass
+      - N8N_ENCRYPTION_KEY=someLongRandomKey
+      - WEBHOOK_URL=https://n8n.sandorkardos.com/
+      
+      # --- NEW FIXES BELOW ---
+      - N8N_HOST=n8n.sandorkardos.com
+      - N8N_EDITOR_BASE_URL=https://n8n.sandorkardos.com
+      - N8N_CORS_ORIGIN=*
+      # N8N_CORS_ALLOW_CREDENTIALS=true  <-- MUST be disabled when using * wildcard
+      
+    volumes:
+      - n8n_data:/home/node/.n8n
+    restart: always
+
+volumes:
+  n8n_data:

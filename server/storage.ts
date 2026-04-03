@@ -1,4 +1,4 @@
-import { profiles, type Profile, type InsertProfile } from "@shared/schema";
+import { profiles, type Profile, type InsertProfile } from "../shared/schema.ts";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 

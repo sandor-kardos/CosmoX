@@ -1,10 +1,10 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertProfileSchema } from "@shared/schema";
 import { calculateZodiacProfile } from "../client/src/lib/zodiac-calculator";
 import { generateDailyInsights, generateCompatibilityAdvice } from "./gemini";
-import type { ZodiacProfile } from "@shared/schema";
+import { insertProfileSchema } from "../shared/schema";
+import { calculateZodiacProfile } from "../shared/zodiac-calculator";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   // Create a new profile
