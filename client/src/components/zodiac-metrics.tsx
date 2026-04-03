@@ -20,6 +20,9 @@ import {
   Area,
   Legend,
   Cell,
+  ScatterChart,
+  Scatter,
+  ZAxis,
 } from "recharts";
 import type { ZodiacProfile } from "@shared/schema";
 
@@ -421,101 +424,103 @@ export function ZodiacMetrics({ zodiacProfile, selectedSystems }: ZodiacMetricsP
         <TabsContent value="bubble" className="mt-4">
           <Card className="bg-gradient-to-br from-slate-900/50 to-slate-800/50 border border-slate-700/50">
             <CardHeader>
-              <CardTitle className="text-lg text-white">Trait Comparison Matrix</CardTitle>
-              <p className="text-sm text-gray-400">Heatmap showing trait scores across zodiac systems (0-100)</p>
+              <CardTitle className="text-lg text-white">Cosmic Trait Constellations</CardTitle>
+              <p className="text-sm text-gray-400">A celestial dot plot mapping your strengths across systems</p>
             </CardHeader>
             <CardContent>
-              {(() => {
-                const systems = [
-                  { key: 'western', name: 'Western', scores: [90, 75, 65, 80, 78, 82] },
-                  { key: 'chinese', name: 'Chinese', scores: [80, 90, 70, 75, 82, 88] },
-                  { key: 'vedic', name: 'Vedic', scores: [85, 95, 80, 85, 75, 92] },
-                  { key: 'arabic', name: 'Arabic', scores: [78, 88, 75, 82, 80, 85] },
-                  { key: 'mayan', name: 'Mayan', scores: [70, 88, 78, 85, 72, 80] },
-                  { key: 'celtic', name: 'Celtic', scores: [72, 85, 78, 90, 75, 87] },
-                ];
-                const traits = ['Leadership', 'Creativity', 'Intuition', 'Empathy', 'Ambition', 'Balance'];
+              <div className="w-full overflow-hidden">
+                <ResponsiveContainer width="100%" height={450}>
+                  {(() => {
+                    const systemDataMap = [
+                      { key: 'western', name: 'Western', color: '#00f0ff', scores: [90, 75, 65, 80, 78, 82] },
+                      { key: 'chinese', name: 'Chinese', color: '#ff0032', scores: [80, 90, 70, 75, 82, 88] },
+                      { key: 'vedic', name: 'Vedic', color: '#8f00ff', scores: [85, 95, 80, 85, 75, 92] },
+                      { key: 'arabic', name: 'Arabic', color: '#ffa700', scores: [78, 88, 75, 82, 80, 85] },
+                      { key: 'mayan', name: 'Mayan', color: '#c6866d', scores: [70, 88, 78, 85, 72, 80] },
+                      { key: 'celtic', name: 'Celtic', color: '#00ff59', scores: [72, 85, 78, 90, 75, 87] },
+                    ];
+                    const traits = ['Leadership', 'Creativity', 'Intuition', 'Empathy', 'Ambition', 'Balance'];
 
-                const getColorForScore = (score: number) => {
-                  if (score >= 90) return '#9ca3af'; // gray-400
-                  if (score >= 80) return '#6b7280'; // gray-500
-                  if (score >= 70) return '#4b5563'; // gray-600
-                  if (score >= 60) return '#374151'; // gray-700
-                  if (score >= 50) return '#1f2937'; // gray-800
-                  return '#111827'; // gray-900
-                };
+                    const graphData = systemDataMap.filter(s => isSystemVisible(s.key)).map(s => {
+                      return {
+                        ...s,
+                        data: traits.map((t, idx) => ({ trait: t, score: s.scores[idx], systemName: s.name, color: s.color }))
+                      };
+                    });
 
-                const visibleSystems = systems.filter(s => isSystemVisible(s.key));
-
-                return (
-                  <div>
-                    {/* Header Row */}
-                    <div className="flex mb-2">
-                      <div className="w-20 sm:w-28 flex-shrink-0"></div>
-                      {traits.map((trait) => (
-                        <div key={trait} className="flex-1 text-center">
-                          <span className="text-[10px] sm:text-xs font-semibold text-gray-300 block">{trait}</span>
-                        </div>
-                      ))}
-                    </div>
-
-                    {/* Heatmap Grid */}
-                    <div>
-                      {visibleSystems.map((system) => (
-                        <div key={system.key} className="flex items-center">
-                          <div className="w-20 sm:w-28 flex-shrink-0 pr-2">
-                            <span className="text-xs sm:text-sm font-semibold text-white">{system.name}</span>
+                    const CustomTooltip = ({ active, payload }: any) => {
+                      if (active && payload && payload.length) {
+                        const data = payload[0].payload;
+                        return (
+                          <div className="bg-slate-800/95 backdrop-blur-sm border border-slate-600 p-3 rounded-lg shadow-2xl z-50">
+                            <p className="font-semibold text-slate-300 text-xs mb-1 uppercase tracking-wider">{data.trait}</p>
+                            <div className="flex items-center gap-2">
+                              <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: data.color, boxShadow: `0 0 10px ${data.color}` }} />
+                              <span className="text-white text-sm font-medium">{data.systemName}: <span className="font-bold text-lg">{data.score}</span></span>
+                            </div>
                           </div>
-                          <div className="flex-1 flex">
-                            {system.scores.map((score, idx) => (
-                              <div
-                                key={idx}
-                                className="flex-1 py-4 sm:py-6 flex items-center justify-center border border-gray-700/50"
-                                style={{ 
-                                  backgroundColor: getColorForScore(score),
-                                }}
-                              >
-                                <span className="text-sm sm:text-lg font-bold text-gray-900">{score}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
+                        );
+                      }
+                      return null;
+                    };
 
-                    {/* Color Scale Legend */}
-                    <div className="mt-6 pt-4 border-t border-gray-700/50">
-                      <p className="text-xs text-gray-400 mb-2 text-center">Color Scale (Score Range) - Darker = Lower Score</p>
-                      <div className="flex flex-wrap justify-center items-center gap-1 sm:gap-2">
-                        <div className="flex items-center gap-1">
-                          <div className="w-6 h-5 sm:w-8 sm:h-6 border border-gray-600" style={{ backgroundColor: '#111827' }}></div>
-                          <span className="text-[10px] sm:text-xs text-gray-400">40-49</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-6 h-5 sm:w-8 sm:h-6 border border-gray-600" style={{ backgroundColor: '#1f2937' }}></div>
-                          <span className="text-[10px] sm:text-xs text-gray-400">50-59</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-6 h-5 sm:w-8 sm:h-6 border border-gray-600" style={{ backgroundColor: '#374151' }}></div>
-                          <span className="text-[10px] sm:text-xs text-gray-400">60-69</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-6 h-5 sm:w-8 sm:h-6 border border-gray-600" style={{ backgroundColor: '#4b5563' }}></div>
-                          <span className="text-[10px] sm:text-xs text-gray-400">70-79</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-6 h-5 sm:w-8 sm:h-6 border border-gray-600" style={{ backgroundColor: '#6b7280' }}></div>
-                          <span className="text-[10px] sm:text-xs text-gray-400">80-89</span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <div className="w-6 h-5 sm:w-8 sm:h-6 border border-gray-600" style={{ backgroundColor: '#9ca3af' }}></div>
-                          <span className="text-[10px] sm:text-xs text-gray-400">90-100</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })()}
+                    return (
+                      <ScatterChart margin={{ top: 20, right: 30, left: 30, bottom: 20 }}>
+                        <defs>
+                          <filter id="star-glow" x="-50%" y="-50%" width="200%" height="200%">
+                            <feGaussianBlur stdDeviation="4" result="blur" />
+                            <feComposite in="SourceGraphic" in2="blur" operator="over" />
+                          </filter>
+                        </defs>
+                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" horizontal={true} vertical={false} />
+                        <XAxis 
+                          type="number" 
+                          dataKey="score" 
+                          domain={[40, 100]} 
+                          stroke="#64748b" 
+                          tick={{ fill: '#94a3b8', fontSize: 12 }} 
+                          tickCount={7}
+                        />
+                        <YAxis 
+                          type="category" 
+                          dataKey="trait" 
+                          stroke="#64748b" 
+                          allowDuplicatedCategory={false}
+                          tick={{ fill: '#cbd5e1', fontSize: 12, fontWeight: 500 }} 
+                          width={90}
+                        />
+                        <ZAxis type="number" range={[150, 150]} />
+                        <Tooltip 
+                          cursor={{ strokeDasharray: '3 3', stroke: '#475569', strokeWidth: 1 }} 
+                          content={<CustomTooltip />} 
+                        />
+                        <Legend wrapperStyle={{ paddingTop: '10px' }} iconType="circle" />
+                        {graphData.map((sys) => (
+                          <Scatter 
+                            key={sys.key} 
+                            name={sys.name} 
+                            data={sys.data} 
+                            fill={sys.color}
+                            shape={(props: any) => {
+                              const { cx, cy, fill } = props;
+                              return (
+                                <g className="cursor-pointer transition-transform hover:scale-125 origin-center" style={{ transformOrigin: `${cx}px ${cy}px` }}>
+                                  {/* Glowing aura */}
+                                  <circle cx={cx} cy={cy} r={8} fill={fill} filter="url(#star-glow)" opacity={0.6} />
+                                  {/* Solid core */}
+                                  <circle cx={cx} cy={cy} r={4} fill="#fff" />
+                                  {/* Tiny inner center */}
+                                  <circle cx={cx} cy={cy} r={1.5} fill={fill} />
+                                </g>
+                              );
+                            }}
+                          />
+                        ))}
+                      </ScatterChart>
+                    );
+                  })()}
+                </ResponsiveContainer>
+              </div>
               <ZodiacToggleButtons />
             </CardContent>
           </Card>
