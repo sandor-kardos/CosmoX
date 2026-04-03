@@ -13,5 +13,6 @@ COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/server ./server
 COPY --from=build /app/shared ./shared
 COPY --from=build /app/dist ./dist
+COPY --from=build /app/dist/public ./dist/server/public
 EXPOSE 5000
 CMD ["node", "dist/index.js"]
